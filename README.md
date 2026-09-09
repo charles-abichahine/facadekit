@@ -42,9 +42,12 @@ waste figure comes from the naive packer. Both change the headline percentages.
 Python 3.11+.
 
 ```bash
-uv venv --python 3.11 .venv
-uv pip install -e "packages/core[dev]" -e adapters/generate
+uv sync --extra dev
 ```
+
+Installs from `uv.lock`, so every version is pinned — the numbers this produces
+are reproducible. `--extra solver` adds OR-Tools, `--extra segment` adds SAM and
+torch; neither is needed for the baseline pipeline.
 
 No image, no GPU, straight into the solver — this is October's working mode:
 

@@ -19,10 +19,12 @@ jobs:
         with:
           enable-cache: true
 
-      - name: Install (core + generate adapter + api)
-        run: |
-          uv venv --python 3.11
-          uv pip install -e "packages/core[dev]" -e adapters/generate -e "apps/api[dev]"
+      - name: Install from the lockfile
+        # --locked fails if uv.lock is out of date with the pyproject files,
+        # so a dependency change that was not locked cannot pass CI.
+        # No --all-extras: that would pull torch and OR-Tools, which are
+        # pinned in the lock but deliberately not installed here.
+        run: uv sync --locked --extra dev
 
       - name: Lint
         run: uv run ruff check packages/core adapters/generate apps/api

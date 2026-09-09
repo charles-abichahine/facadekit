@@ -1,0 +1,13 @@
+# Workspace root. Not a package -- it exists so `uv lock` can resolve the three
+# Python packages in this repo together and pin every version in uv.lock.
+#
+# Why pin at all: the thesis reports numbers produced by a specific OR-Tools,
+# numpy and ezdxf. An unpinned `>=` install six months from now can resolve to
+# different versions, and a different CP-SAT can return a different (equally
+# optimal) assignment. The lock is what makes "these are the numbers" checkable.
+[tool.uv.workspace]
+members = [
+    "packages/core",
+    "adapters/generate",
+    "apps/api",
+]
