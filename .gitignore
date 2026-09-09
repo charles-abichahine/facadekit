@@ -21,6 +21,7 @@ node_modules/
 .vite/
 apps/web/dist/
 .vercel/
+*.tsbuildinfo
 
 # model weights & big binaries (never commit; see docs/deploy.md)
 *.safetensors
