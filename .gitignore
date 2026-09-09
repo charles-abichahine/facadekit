@@ -1,0 +1,39 @@
+# --- secrets: gitignored from the first commit, never negate these ---
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+dist/
+build/
+
+# node
+node_modules/
+.vite/
+apps/web/dist/
+.vercel/
+
+# model weights & big binaries (never commit; see docs/deploy.md)
+*.safetensors
+*.ckpt
+*.pth
+*.onnx
+
+# run artefacts
+out/
+runs/
+storage/
+*.dxf
+*.csv
+!data/**/*.csv
+.DS_Store
+Thumbs.db
