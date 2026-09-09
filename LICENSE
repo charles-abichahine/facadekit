@@ -1,0 +1,30 @@
+MIT License
+
+Copyright (c) 2026 Charles Abi Chahine
+
+SCOPE. This licence covers the original work in this repository. It does NOT
+cover the files under tools/comfyui/ and tools/legoarch-reference/, which were
+copied from LegoArch (github.com/hi-em/genai-legoarch), a project co-authored
+by Charles Abi Chahine and Emilie El Chidiac for IAAC MaCAD 2025/26. That
+project publishes no licence, so all rights in it are reserved by its authors
+jointly. Those files are included here with attribution, for reference and for
+the author's own continued use; they are not offered to third parties under the
+MIT terms below, and no third party should assume a right to reuse them.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
