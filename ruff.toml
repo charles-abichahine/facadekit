@@ -1,0 +1,21 @@
+# One lint config for every Python package in the repo, so CI and local runs
+# cannot disagree about what "clean" means.
+target-version = "py311"
+line-length = 100
+exclude = [".venv", "tools/legoarch-reference"]  # reference copies stay verbatim
+
+[lint]
+select = ["E", "F", "I", "B", "UP", "W"]
+ignore = [
+  # Typer's whole API is `def cmd(x: T = typer.Option(...))`. B008 exists for
+  # mutable defaults; typer.Option is neither mutable nor shared state.
+  "B008",
+]
+
+[lint.per-file-ignores]
+"**/tests/*" = ["E501"]
+
+[lint.isort]
+# Without this, ruff sorts our own packages in with third-party imports and
+# `from app.main import app` lands above fastapi.
+known-first-party = ["facadekit", "facadekit_generate", "app"]
