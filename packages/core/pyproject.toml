@@ -1,0 +1,39 @@
+[project]
+name = "facadekit"
+version = "0.1.0"
+description = "Legalise generated facades against a real manufacturer's kit of parts"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Charles Abi Chahine", email = "charles.abi.chahine@students.iaac.net" }]
+
+# Deliberately small. SAM, torch and the solver arrive behind extras so that
+# `facadekit run` on a hand-drawn mask works on a CPU box with no ML stack.
+dependencies = [
+    "numpy>=1.26",
+    "pillow>=10.0",
+    "ezdxf>=1.3",
+    "typer>=0.12",
+]
+
+[project.optional-dependencies]
+# The CP-SAT legaliser (October work). Not needed by the baseline.
+solver = ["ortools>=9.10"]
+# SAM segmentation. Heavy; the deployed demo runs without it.
+segment = ["torch>=2.2", "segment-anything>=1.0", "opencv-python-headless>=4.9"]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[project.scripts]
+facadekit = "facadekit.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["facadekit"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+# Lint config lives in the repo-root ruff.toml, for every package at once.
