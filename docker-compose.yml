@@ -1,0 +1,52 @@
+# Local development: the API and the web app, one command.
+#
+#   docker compose up --build
+#   -> web  http://localhost:5173
+#      api  http://localhost:8000/healthz
+#
+# This is NOT how the thing deploys. Production is Vercel (web) + Fly.io (api);
+# see docs/deploy.md.
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      # cached costs nothing and needs no key. Override in apps/api/.env to
+      # spend money on fal.ai -- deliberately never the default.
+      FACADEKIT_GENERATE: ${FACADEKIT_GENERATE:-cached}
+      CORS_ORIGINS: http://localhost:5173
+      STORAGE_BACKEND: local
+    env_file:
+      # Optional: absent on a fresh clone, and it must stay that way -- .env is
+      # gitignored and holds keys.
+      - path: apps/api/.env
+        required: false
+    volumes:
+      - api-storage:/app/storage
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/healthz').read()"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      # The Vite dev proxy forwards /api to the api service over the compose
+      # network, so the browser still sees a single origin.
+      VITE_PROXY_TARGET: http://api:8000
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  api-storage:

@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: pytest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install (core + generate adapter + api)
+        run: |
+          uv venv --python 3.11
+          uv pip install -e "packages/core[dev]" -e adapters/generate -e "apps/api[dev]"
+
+      - name: Lint
+        run: uv run ruff check packages/core adapters/generate apps/api
+
+      - name: Test
+        run: uv run pytest packages/core/tests apps/api/tests -q
+
+      - name: Pipeline smoke test
+        # Belt and braces: the CLI is the interface Charles actually uses in
+        # October, so CI runs it for real and checks the artefacts exist.
+        run: |
+          uv run facadekit check data/catalogues/demo.json
+          uv run facadekit run \
+            --mask data/samples/masks/banded.png \
+            --catalogue data/catalogues/demo.json \
+            --out /tmp/ci-run
+          test -s /tmp/ci-run/schedule.csv
+          test -s /tmp/ci-run/nesting.dxf
+          test -s /tmp/ci-run/panel-map.png
+          test -s /tmp/ci-run/run.json
+
+  web:
+    name: web build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build

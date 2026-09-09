@@ -1,0 +1,11 @@
+.git
+.venv
+out
+storage
+node_modules
+apps/web/dist
+**/__pycache__
+**/*.pyc
+.pytest_cache
+.ruff_cache
+*.safetensors
