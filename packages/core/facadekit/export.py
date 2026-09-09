@@ -33,10 +33,12 @@ class ExportPaths:
     panel_map: Path
 
     def as_dict(self) -> dict[str, str]:
+        """Just the filenames: the directory is the caller's business, and an
+        absolute path from one machine is meaningless in another's dataset."""
         return {
-            "schedule": str(self.schedule),
-            "dxf": str(self.dxf),
-            "panel_map": str(self.panel_map),
+            "schedule": self.schedule.name,
+            "dxf": self.dxf.name,
+            "panel_map": self.panel_map.name,
         }
 
 

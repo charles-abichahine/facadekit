@@ -29,6 +29,8 @@ from facadekit.legalise import DEFAULT_TOLERANCE_MM, LegalisationResult, get_leg
 from facadekit.nest import NestResult, nest
 from facadekit.segment import Panel, read_mask, segment_image
 
+REPO_ROOT = Path(__file__).resolve().parents[3]
+
 DEFAULT_FACADE_WIDTH_MM = 12000.0
 DEFAULT_GRID_MM = 300.0
 """Structural grid the panel edges snap to. 300 mm is a common facade module and
@@ -60,6 +62,24 @@ class RunConfig:
     seed: int = 0
 
 
+def _portable(path: Path | None) -> str | None:
+    """A path that means the same thing on another machine.
+
+    Relative to the repo root where possible, always forward slashes. Rows
+    written on Windows and on the Linux deploy box have to be joinable in one
+    dataset; "data\\samples\\masks\\banded.png" and "data/samples/masks/banded.png"
+    are not the same string.
+    """
+    if path is None:
+        return None
+    path = Path(path)
+    try:
+        path = path.resolve().relative_to(REPO_ROOT)
+    except ValueError:
+        pass  # outside the repo (a tmpdir, an absolute mask): keep as given
+    return path.as_posix()
+
+
 @dataclass
 class RunResult:
     out_dir: Path
@@ -68,6 +88,7 @@ class RunResult:
     legalisation: LegalisationResult
     nesting: NestResult
     exports: ExportPaths
+    config: RunConfig | None = None
     image_path: Path | None = None
     mask_path: Path | None = None
     generator: str = "none"
@@ -75,7 +96,14 @@ class RunResult:
 
     @property
     def manifest(self) -> dict[str, Any]:
-        """The dataset row for this run."""
+        """The dataset row for this run.
+
+        `settings` is not bookkeeping. The legalisation tolerance is currently an
+        invented number (see legalise.DEFAULT_TOLERANCE_MM) and it directly sets
+        `legalised_fraction`; a row that does not record which tolerance produced
+        it cannot be compared with another row, and cannot be reproduced.
+        """
+        c = self.config or RunConfig()
         return {
             "facadekit_version": __version__,
             "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
@@ -85,9 +113,17 @@ class RunResult:
                 "sheet": asdict(self.catalogue.sheet),
             },
             "generator": self.generator,
+            "brief": c.brief,
             "image": self.image_path.name if self.image_path else None,
-            "mask": str(self.mask_path) if self.mask_path else None,
+            "mask": _portable(self.mask_path),
             "method": self.legalisation.method,
+            "settings": {
+                "seed": c.seed,
+                "grid_mm": c.grid_mm,
+                "tolerance_mm": c.tolerance_mm,
+                "facade_width_mm": c.facade_width_mm,
+                "facade_height_mm": c.facade_height_mm,
+            },
             "panels": len(self.panels),
             "metrics": {**self.legalisation.metrics, **self.nesting.metrics},
             "files": self.exports.as_dict(),
@@ -191,6 +227,7 @@ def run(config: RunConfig, generator: SupportsGenerate | None = None) -> RunResu
         legalisation=legalisation,
         nesting=nesting,
         exports=exports,
+        config=config,
         image_path=image_path,
         mask_path=Path(mask_path),
         generator=generator_name,

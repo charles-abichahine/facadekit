@@ -65,6 +65,17 @@ def test_run_writes_a_dataset_row(tmp_path, hand_drawn_mask, demo_catalogue_path
         assert key in manifest["metrics"], f"{key} missing from the dataset row"
     assert manifest["catalogue"]["system"]
 
+    # A row must record the settings that produced it. tolerance_mm in
+    # particular sets legalised_fraction directly, and is currently an invented
+    # number -- an unrecorded one makes the row incomparable and unreproducible.
+    for key in ("seed", "grid_mm", "tolerance_mm", "facade_width_mm"):
+        assert key in manifest["settings"], f"{key} missing from the dataset row"
+    assert manifest["settings"]["grid_mm"] == 300
+
+    # Paths must mean the same thing on another machine.
+    assert "\\" not in (manifest["mask"] or ""), "mask path is not portable"
+    assert manifest["files"]["schedule"] == "schedule.csv"
+
 
 def test_irregular_mask_does_not_fully_legalise(tmp_path, sample_mask, demo_catalogue_path):
     """The committed irregular sample must leave work for the CP-SAT legaliser.
