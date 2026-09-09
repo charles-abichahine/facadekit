@@ -79,5 +79,5 @@ Not carried over: the legolizer, TRELLIS, the voxeliser, the gravity check.
 
 ## Licence
 
-MIT for the original work — see [LICENSE](LICENSE). **Not MIT:** the copied files
-under `tools/`, which are co-owned with Emilie El Chidiac and carry no licence.
+MIT — see [LICENSE](LICENSE). That includes the files copied from LegoArch under
+`tools/`, with Emilie El Chidiac's agreement as co-author.
